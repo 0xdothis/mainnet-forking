@@ -29,7 +29,7 @@ async function main() {
   );
   console.log(
     "Initial SHIBAINU Balance: ",
-    ethers.formatUnits(initialSHIBAINUBalance.toString(), 6),
+    ethers.formatUnits(initialSHIBAINUBalance.toString(), 18),
   );
 
   console.log(
@@ -55,7 +55,7 @@ async function main() {
   console.log("");
 
   const deadline = Math.floor(Date.now() / 1000) + 60 * 10;
-  const AMOUNT_TO_BE_SWAPPED = ethers.parseUnits("77600000", 6);
+  const AMOUNT_TO_BE_SWAPPED = ethers.parseUnits("77000000", 6);
 
   // Call the UNISWAP SWAP function
   const swapToken = await UNISWAP.connect(AssetHolder).swapExactTokensForTokens(
@@ -79,7 +79,7 @@ async function main() {
 
   console.log(
     "Current SHIBAINU Balance: ",
-    ethers.formatUnits(UpdatedSHIBAINUBalance.toString(), 6),
+    ethers.formatUnits(UpdatedSHIBAINUBalance.toString(), 18),
   );
   console.log(
     "Current USDT Balance: ",
