@@ -100,23 +100,29 @@ async function main() {
     ethers.formatUnits(UpdatedUSDTBalance.toString(), 6),
   );
 
+  // GET THE AMOUNT OF LP TOKEN MINTED TO THE LP PROVIDER ADDRESS
   const LP_AMOUNT = await POOL.balanceOf(AssetHolder);
 
+  // CONVERT IT TO STRING AND PARSE IT TO FLOAT TO BE ABLE TO GET 50% OF THE RETURNED VALUE
+  const AMOUNT_OF_LP =
+    parseFloat(ethers.formatUnits(LP_AMOUNT.toString(), 6)) * 0.5;
+
+  // CONVERT THE VALUE BACK BIG INT AND ROUND IT UP TO 2 DECIMAL PLACE BECAUSE OF UNDER_FLOW/OVER_FLOW
+  const AMOUNT_TO_REMOVE = ethers.parseUnits(AMOUNT_OF_LP.toFixed(2), 6);
+
   // Approve contract to be able to pull out liquidity
-  await POOL.connect(AssetHolder).approve(UNIRouter, LP_AMOUNT);
+  await POOL.connect(AssetHolder).approve(UNIRouter, AMOUNT_TO_REMOVE);
 
-  console.log(ethers.formatUnits(LP_AMOUNT.toString(), 6));
-
-  const amountOfUSDCtoRemove = ethers.parseUnits("60000000", 6);
-  const amountOfUSDTtoRemove = ethers.parseUnits("60000000", 6);
+  // const amountOfUSDCtoRemove = ethers.parseUnits("10000000", 6);
+  // const amountOfUSDTtoRemove = ethers.parseUnits("10000000", 6);
 
   // REMOVE LIQUIDY
   const removeLiquidity = await UNISWAP.connect(AssetHolder).removeLiquidity(
     USDCAddress,
     USDTAddress,
-    LP_AMOUNT,
-    amountOfUSDCtoRemove,
-    amountOfUSDTtoRemove,
+    AMOUNT_TO_REMOVE,
+    1,
+    1,
     AssetHolder.address,
     deadline,
   );
@@ -124,7 +130,7 @@ async function main() {
   const removeLiquidityTx = await removeLiquidity.wait();
 
   console.log(
-    "::::::::::::::::::::::LIQUIDITY REMOVED RECEIPT::::::::::::::::::::::::::::::::::",
+    "::::::::::::::::::::::REMOVED 50% FROM LIQUIDITY POOL::::::::::::::::::::::::::::::::::",
   );
   console.log("LIQUIDITY REMOVED SUCCESSFULLY: ", removeLiquidityTx!.hash);
   console.log("");
